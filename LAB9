@@ -1,0 +1,36 @@
+9.	Write a program to compute the finish time, turnaround time and waiting time for the First come First serve
+import java.util.Scanner;
+public class FCFS_Simple {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of processes: ");
+        int n = scanner.nextInt();
+        int[] arrivalTime = new int[n];
+        int[] burstTime = new int[n];
+        int[] finishTime = new int[n];
+        int[] turnaroundTime = new int[n];
+        int[] waitingTime = new int[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter arrival time for process " + (i + 1) + ": ");
+            arrivalTime[i] = scanner.nextInt();
+            System.out.print("Enter burst time for process " + (i + 1) + ": ");
+            burstTime[i] = scanner.nextInt();
+        }
+        int currentTime = 0;
+        for (int i = 0; i < n; i++) {
+            if (currentTime < arrivalTime[i]) {
+                currentTime = arrivalTime[i];
+            }
+            finishTime[i] = currentTime + burstTime[i];
+            turnaroundTime[i] = finishTime[i] - arrivalTime[i];
+            waitingTime[i] = turnaroundTime[i] - burstTime[i];
+            currentTime = finishTime[i];
+        }
+        System.out.println("\nProcess\t\tArrival\t\tBurst\t\tFinish\t\tTurnaround\t\tWaiting");
+        for (int i = 0; i < n; i++) {
+            System.out.println((i + 1) + "\t\t" + arrivalTime[i] + "\t\t" + burstTime[i] + "\t\t" +
+                               finishTime[i] + "\t\t" + turnaroundTime[i] + "\t\t\t" + waitingTime[i]);
+        }
+        scanner.close();
+    }
+}
