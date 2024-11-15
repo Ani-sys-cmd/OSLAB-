@@ -1,0 +1,96 @@
+10.	Write a program to compute the finish time, turnaround time and waiting time for the
+ Shortest Job First (Preemptive and Non Preemptive)
+import java.util.Scanner;
+class Process {
+    int arrivalTime;
+    int burstTime;
+    int waitingTime;
+    int turnaroundTime;
+    int finishTime;
+    Process(int arrivalTime, int burstTime) {
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+    }
+}
+public class SimpleSJF {
+    public static void sjfNonPreemptive(Process[] processes, int n) {
+        int currentTime = 0;
+        for (int i = 0; i < n; i++) {
+            int minIndex = -1;
+            int minBurst = Integer.MAX_VALUE;
+            for (int j = 0; j < n; j++) {
+                if (processes[j].arrivalTime <= currentTime && processes[j].finishTime == 0 && processes[j].burstTime < minBurst) {
+                    minBurst = processes[j].burstTime;
+                    minIndex = j;
+                }
+            }
+            if (minIndex == -1) {
+                currentTime++;
+            } else {
+                Process p = processes[minIndex];
+                p.finishTime = currentTime + p.burstTime;
+                p.turnaroundTime = p.finishTime - p.arrivalTime;
+                p.waitingTime = p.turnaroundTime - p.burstTime;
+                currentTime += p.burstTime;
+            }
+        }
+    }
+    public static void sjfPreemptive(Process[] processes, int n) {
+        int[] remainingBurst = new int[n];
+        int complete = 0, currentTime = 0, shortest = -1, minBurst = Integer.MAX_VALUE;
+        boolean found;
+        for (int i = 0; i < n; i++) remainingBurst[i] = processes[i].burstTime;
+        while (complete < n) {
+            found = false;
+            for (int j = 0; j < n; j++) {
+                if (processes[j].arrivalTime <= currentTime && remainingBurst[j] < minBurst && remainingBurst[j] > 0) {
+                    minBurst = remainingBurst[j];
+                    shortest = j;
+                    found = true;
+                }
+            }
+            if (!found) {
+                currentTime++;
+                continue;
+            }
+            remainingBurst[shortest]--;
+            minBurst = remainingBurst[shortest] == 0 ? Integer.MAX_VALUE : remainingBurst[shortest];
+            if (remainingBurst[shortest] == 0) {
+                complete++;
+                processes[shortest].finishTime = currentTime + 1;
+                processes[shortest].turnaroundTime = processes[shortest].finishTime - processes[shortest].arrivalTime;
+                processes[shortest].waitingTime = processes[shortest].turnaroundTime - processes[shortest].burstTime;
+            }
+            currentTime++;
+        }
+    }
+    public static void displayResults(Process[] processes, String type) {
+        System.out.println("\n" + type + " SJF Scheduling:");
+        System.out.printf("%-15s%-15s%-15s%-15s%-15s%n", "Arrival Time", "Burst Time", "Finish Time", "Turnaround Time", "Waiting Time");
+        for (Process p : processes) {
+            System.out.printf("%-15d%-15d%-15d%-15d%-15d%n", p.arrivalTime, p.burstTime, p.finishTime, p.turnaroundTime, p.waitingTime);
+        }
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the number of processes: ");
+        int n = sc.nextInt();
+        Process[] processes = new Process[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter arrival time and burst time for process " + (i + 1) + ": ");
+            int arrivalTime = sc.nextInt();
+            int burstTime = sc.nextInt();
+            processes[i] = new Process(arrivalTime, burstTime);
+        }
+        Process[] processesNonPreemptive = new Process[n];
+        Process[] processesPreemptive = new Process[n];
+        for (int i = 0; i < n; i++) {
+            processesNonPreemptive[i] = new Process(processes[i].arrivalTime, processes[i].burstTime);
+            processesPreemptive[i] = new Process(processes[i].arrivalTime, processes[i].burstTime);
+        }
+        sjfNonPreemptive(processesNonPreemptive, n);
+        displayResults(processesNonPreemptive, "Non-Preemptive");
+        sjfPreemptive(processesPreemptive, n);
+        displayResults(processesPreemptive, "Preemptive");
+    }
+}
