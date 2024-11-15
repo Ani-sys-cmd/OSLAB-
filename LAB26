@@ -1,0 +1,60 @@
+26.	Write a program to check Opcode error in a given job and raise an interrupt.
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+// Globals for interrupts
+int PI = 0; // Program Interrupt
+
+// Interrupt Service Routine
+void MOS() {
+    if (PI == 4) { // Opcode error
+        cout << "Interrupt Raised: Opcode Error Detected." << endl;
+        cout << "Terminating the job due to invalid opcode." << endl;
+    }
+}
+
+// Function to check the validity of an opcode
+bool isValidOpcode(const string &opcode) {
+    // List of valid opcodes
+    vector<string> validOpcodes = {"GD", "PD", "LR", "SR", "CR", "H", "BT"};
+    for (const auto &valid : validOpcodes) {
+        if (opcode == valid) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Function to simulate opcode execution
+void executeJob(const vector<string> &job) {
+    for (const auto &instruction : job) {
+        string opcode = instruction.substr(0, 2); // Extract first 2 characters as opcode
+        if (!isValidOpcode(opcode)) {
+            cout << "Invalid Opcode Found: " << opcode << endl;
+            PI = 4; // Set Program Interrupt for Opcode Error
+            MOS();  // Call interrupt service routine
+            return; // Terminate job due to error
+        }
+        cout << "Executing: " << instruction << endl;
+    }
+    cout << "Job executed successfully without errors." << endl;
+}
+
+int main() {
+    // Sample job containing instructions
+    vector<string> job = {
+        "GD 100",  // Valid opcode
+        "PD 200",  // Valid opcode
+        "LR 300",  // Valid opcode
+        "SR 400",  // Invalid opcode
+        "H"        // Valid opcode
+    };
+
+    cout << "Starting Job Execution..." << endl;
+    executeJob(job);
+
+    return 0;
+}
