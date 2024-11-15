@@ -1,0 +1,73 @@
+3.	Implement multi threading for Matrix Operations using Pthreads.
+#include <iostream>
+#include <pthread.h>
+#include <vector>
+const int MAX = 10; // Max size of matrices for simplicity
+int matrixA[MAX][MAX], matrixB[MAX][MAX], result[MAX][MAX];
+int rows, cols;
+void* addMatrices(void* arg) {
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            result[i][j] = matrixA[i][j] + matrixB[i][j];
+    return nullptr;
+}
+V00oid* subtractMatrices(void* arg) {
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            result[i][j] = matrixA[i][j] - matrixB[i][j];
+    return nullptr;
+}
+void* multiplyMatrices(void* arg) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            result[i][j] = 0;
+            for (int k = 0; k < cols; k++) {
+                result[i][j] += matrixA[i][k] * matrixB[k][j];
+            }
+        }
+    }
+    return nullptr;
+}
+void* divideMatrices(void* arg) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            result[i][j] = (matrixB[i][j] != 0) ? matrixA[i][j] / matrixB[i][j] : 0;
+        }
+    }
+    return nullptr;
+}
+void printMatrix(const std::string& operation) {
+    std::cout << "Result of " << operation << ":\n";
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            std::cout << result[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+}
+int main() {
+    std::cout << "Enter number of rows and columns of matrices: ";
+    std::cin >> rows >> cols;
+    std::cout << "Enter elements of Matrix A:\n";
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            std::cin >> matrixA[i][j];
+    std::cout << "Enter elements of Matrix B:\n";
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            std::cin >> matrixB[i][j];
+    pthread_t threads[4];
+    pthread_create(&threads[0], nullptr, addMatrices, nullptr);
+    pthread_join(threads[0], nullptr);
+    printMatrix("Addition");
+    pthread_create(&threads[1], nullptr, subtractMatrices, nullptr);
+    pthread_join(threads[1], nullptr);
+    printMatrix("Subtraction");
+    pthread_create(&threads[2], nullptr, multiplyMatrices, nullptr);
+    pthread_join(threads[2], nullptr);
+    printMatrix("Multiplication");
+    pthread_create(&threads[3], nullptr, divideMatrices, nullptr);
+    pthread_join(threads[3], nullptr);
+    printMatrix("Division");
+    return 0;
+}
