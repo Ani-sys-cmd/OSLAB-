@@ -1,0 +1,56 @@
+24.	Write a program to read and copy the contents of file character by character, line by line.
+import java.io.*;
+public class FileCopyExample {
+    public static void main(String[] args) {
+        String sourceFile = "source.txt";
+        String destinationFileChar = "destination_char.txt";
+        String destinationFileLine = "destination_line.txt";
+        copyCharacterByCharacter(sourceFile, destinationFileChar);
+        copyLineByLine(sourceFile, destinationFileLine);
+    }
+    public static void copyCharacterByCharacter(String sourceFile, String destinationFile) {
+        FileReader reader = null;
+        FileWriter writer = null;
+        try {
+            reader = new FileReader(sourceFile);
+            writer = new FileWriter(destinationFile);
+            int character;
+            while ((character = reader.read()) != -1) {
+                writer.write(character);
+            }
+            System.out.println("File copied character by character to " + destinationFile);
+        } catch (IOException e) {
+            System.out.println("Error during character-by-character copy: " + e.getMessage());
+        } finally {
+            try {
+                if (reader != null) reader.close();
+                if (writer != null) writer.close();
+            } catch (IOException e) {
+                System.out.println("Error closing file resources: " + e.getMessage());
+            }
+        }
+    }
+    public static void copyLineByLine(String sourceFile, String destinationFile) {
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        try {
+            reader = new BufferedReader(new FileReader(sourceFile));
+            writer = new BufferedWriter(new FileWriter(destinationFile));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                writer.write(line);
+                writer.newLine(); // Add a new line after each line
+            }
+            System.out.println("File copied line by line to " + destinationFile);
+        } catch (IOException e) {
+            System.out.println("Error during line-by-line copy: " + e.getMessage());
+        } finally {
+            try {
+                if (reader != null) reader.close();
+                if (writer != null) writer.close();
+            } catch (IOException e) {
+                System.out.println("Error closing file resources: " + e.getMessage());
+            }
+        }
+    }
+}
