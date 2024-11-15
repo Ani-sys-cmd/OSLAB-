@@ -1,0 +1,104 @@
+17.	Write a program to calculate the number of page faults for a reference string for the Optimal page replacement algorithms: 
+import java.util.Scanner;
+
+public class OptimalPageReplacement {
+
+    static final int MAX_PAGES = 3;
+
+    static boolean isInMemory(int page, int[] memory, int numFrames) {
+        for (int i = 0; i < numFrames; i++) {
+            if (memory[i] == page) {
+                return true; // Page is in memory
+            }
+        }
+        return false; // Page is not in memory
+    }
+
+    static void displayMemory(int[] memory, int numFrames) {
+        System.out.print("Memory: ");
+        for (int i = 0; i < numFrames; i++) {
+            System.out.print(memory[i] + " ");
+        }
+        System.out.println();
+    }
+
+    static int findOptimal(int[] pages, int start, int numPages, int[] memory, int numFrames) {
+        int farthest = -1;
+        int farthestIndex = -1;
+
+        for (int i = 0; i < numFrames; i++) {
+            int currentPage = memory[i];
+            int j;
+
+            for (j = start; j < numPages; j++) {
+                if (pages[j] == currentPage) {
+                    if (j > farthest) {
+                        farthest = j;
+                        farthestIndex = i;
+                    }
+                    break;
+                }
+            }
+
+            if (j == numPages) {
+                return i; // If a page will not be referenced in the future, replace it
+            }
+        }
+
+        if (farthestIndex == -1) {
+            return 0; // Default case: replace the first page if no other page is farthest
+        }
+
+        return farthestIndex;
+    }
+
+    static void OPT(int[] pages, int numPages) {
+        int[] memory = new int[MAX_PAGES];
+        // Initialize memory to 0 to match the C output
+        for (int i = 0; i < MAX_PAGES; i++) memory[i] = 0;
+
+        int hits = 0;
+        int misses = 0;
+
+        System.out.print("Referenced String: ");
+        for (int page : pages) {
+            System.out.print(page + " ");
+        }
+        System.out.println();
+
+        System.out.println("OPT Page Replacement:");
+        for (int i = 0; i < numPages; i++) {
+            int currentPage = pages[i];
+
+            if (isInMemory(currentPage, memory, MAX_PAGES)) {
+                hits++;
+            } else {
+                misses++;
+                int replaceIndex = findOptimal(pages, i + 1, numPages, memory, MAX_PAGES);
+                memory[replaceIndex] = currentPage;
+            }
+
+            displayMemory(memory, MAX_PAGES);
+        }
+
+        System.out.println("Hits: " + hits);
+        System.out.println("Misses: " + misses);
+        System.out.println("Page Faults: " + misses);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of pages: ");
+        int numPages = scanner.nextInt();
+
+        int[] pages = new int[numPages];
+        System.out.println("Enter the page references:");
+        for (int i = 0; i < numPages; i++) {
+            pages[i] = scanner.nextInt();
+        }
+
+        OPT(pages, numPages);
+        scanner.close();
+    }
+}
