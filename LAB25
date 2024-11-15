@@ -1,0 +1,50 @@
+25.	Write a program to load ALP program from input file to main memory.
+import java.io.*;
+import java.util.*;
+
+public class ALPLoader {
+
+    // Simulating the main memory as an array of strings
+    static final int MEMORY_SIZE = 1024;  // Memory size
+    static String[] memory = new String[MEMORY_SIZE];
+
+    public static void main(String[] args) {
+        String inputFile = "input.alp";  // Input ALP file
+
+        try {
+            loadALPToMemory(inputFile);
+            System.out.println("ALP Program loaded into memory successfully.");
+            // Optionally, display the loaded memory
+            displayMemory();
+        } catch (IOException e) {
+            System.err.println("Error loading ALP program: " + e.getMessage());
+        }
+    }
+
+    // Method to load the ALP program from the input file into memory
+    public static void loadALPToMemory(String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        String line;
+        int address = 0;
+
+        while ((line = reader.readLine()) != null && address < MEMORY_SIZE) {
+            memory[address] = line.trim();  // Load the instruction into memory
+            address++;
+        }
+        reader.close();
+    }
+
+    // Method to display the memory content (for debugging purposes)
+    public static void displayMemory() {
+        System.out.println("Memory contents:");
+        for (int i = 0; i < MEMORY_SIZE; i++) {
+            if (memory[i] != null) {
+                System.out.println("Address " + i + ": " + memory[i]);
+            }
+        }
+    }
+}
+LOAD R1, 100
+ADD R2, R3
+MOV R4, R5
+HALT
