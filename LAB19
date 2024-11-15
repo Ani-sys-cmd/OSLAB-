@@ -1,0 +1,37 @@
+19.	Write a program to simulate SSTF disk scheduling. Calculate total seek time.Print accepted input and output in tabular format
+import java.util.Scanner;
+public class SimpleSSTF {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the starting position of the disk: ");
+        int start = scanner.nextInt();
+        System.out.print("Enter the number of disk requests: ");
+        int n = scanner.nextInt();
+        int[] requests = new int[n];
+        System.out.println("Enter the disk positions:");
+        for (int i = 0; i < n; i++) {
+            requests[i] = scanner.nextInt();
+        }
+        int totalSeekTime = 0;
+        int currentPos = start;
+        System.out.println("\nRequest No.\tDisk Position\tSeek Time");
+        for (int i = 0; i < n; i++) {
+            int minSeekTime = Integer.MAX_VALUE;
+            int closestRequest = -1;
+            for (int j = 0; j < n; j++) {
+                if (requests[j] != -1) {
+                    int seekTime = Math.abs(requests[j] - currentPos);
+                    if (seekTime < minSeekTime) {
+                        minSeekTime = seekTime;
+                        closestRequest = j;
+                    }
+                }
+            }
+            System.out.println((i + 1) + "\t\t" + requests[closestRequest] + "\t\t" + minSeekTime);
+            totalSeekTime += minSeekTime;
+            currentPos = requests[closestRequest];
+            requests[closestRequest] = -1;
+        }
+        System.out.println("\nTotal Seek Time: " + totalSeekTime);
+    }
+}
