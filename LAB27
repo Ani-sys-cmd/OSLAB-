@@ -1,0 +1,65 @@
+27.	Write a program to check Operand error in a given job and raise an interrupt.
+import java.util.Scanner;
+
+class OS_Simulation {
+
+    static final int OPERAND_ERROR_INTERRUPT = 2;
+
+    // Method to simulate operand checking
+    public static void checkOperandError(String job) {
+        // Assuming job contains commands in the format "OPCODE OPERAND"
+        String[] instructions = job.split(";");
+
+        for (String instruction : instructions) {
+            String[] parts = instruction.split(" ");
+            if (parts.length != 2) {
+                raiseInterrupt(OPERAND_ERROR_INTERRUPT);
+                System.out.println("Operand Error: Invalid instruction format - " + instruction);
+                return; // Exit after the first error
+            }
+
+            String opcode = parts[0];
+            String operand = parts[1];
+
+            if (!isValidOperand(operand)) {
+                raiseInterrupt(OPERAND_ERROR_INTERRUPT);
+                System.out.println("Operand Error: Invalid Operand - " + operand);
+                return; // Exit after the first error
+            }
+        }
+
+        System.out.println("All Operands are valid.");
+    }
+
+    // Method to check if an operand is valid
+    private static boolean isValidOperand(String operand) {
+        try {
+            // Operand is valid if it's an integer (simulating the operand being a memory address or register)
+            Integer.parseInt(operand);
+            return true;
+        } catch (NumberFormatException e) {
+            return false; // Invalid operand if it can't be parsed to an integer
+        }
+    }
+
+    // Method to raise an interrupt
+    private static void raiseInterrupt(int interruptCode) {
+        // In a real OS, this would trigger interrupt handling
+        System.out.println("Interrupt raised with code: " + interruptCode);
+    }
+
+    public static void main(String[] args) {
+        // Create a Scanner object to read user input
+        Scanner scanner = new Scanner(System.in);
+        
+        // Prompt the user to input instructions
+        System.out.println("Enter instructions in the format 'OPCODE OPERAND', separated by ';':");
+        String job = scanner.nextLine();
+
+        // Pass the input to check for operand errors
+        checkOperandError(job);
+        
+        // Close the scanner
+        scanner.close();
+    }
+}
