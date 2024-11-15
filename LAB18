@@ -1,0 +1,26 @@
+18.	Write a program to simulate FCFS disk scheduling. Calculate total seek time.Print accepted input and output in tabular format
+import java.util.Scanner;
+public class FCFS_DiskScheduling {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the starting position of the disk: ");
+        int start = scanner.nextInt();
+        System.out.print("Enter the number of disk requests: ");
+        int n = scanner.nextInt();
+        int[] requests = new int[n];
+        System.out.println("Enter the disk positions (separate with spaces): ");
+        for (int i = 0; i < n; i++) {
+            requests[i] = scanner.nextInt();
+        }
+        int totalSeekTime = 0;
+        int currentPos = start;
+        System.out.println("\nRequest No.\tDisk Position\tSeek Time");
+        for (int i = 0; i < n; i++) {
+            int seekTime = Math.abs(requests[i] - currentPos); // Seek time for each request
+            totalSeekTime += seekTime; // Add to total seek time
+            System.out.println((i + 1) + "\t\t" + requests[i] + "\t\t" + seekTime);
+            currentPos = requests[i]; // Move disk head to the new position
+        }
+        System.out.println("\nTotal Seek Time: " + totalSeekTime);
+    }
+}
