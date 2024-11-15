@@ -1,0 +1,78 @@
+13.	Write a program to check whether given system is in safe state or not using Banker’s  Deadlock Avoidance algorithm.
+import java.util.Scanner;
+public class BankersAlgorithm {
+    public static boolean isSafe(int processes, int resources, int[][] allocation, int[][] max, int[] available) {
+        int[] work = new int[resources];
+        boolean[] finish = new boolean[processes];
+        int[][] need = new int[processes][resources];
+        for (int i = 0; i < processes; i++) {
+            for (int j = 0; j < resources; j++) {
+                need[i][j] = max[i][j] - allocation[i][j];
+            }
+        }
+        for (int i = 0; i < resources; i++) {
+            work[i] = available[i];
+        }
+        int count = 0;
+        while (count < processes) {
+            boolean found = false;
+            for (int i = 0; i < processes; i++) {
+                if (!finish[i]) {
+                    boolean canFinish = true;
+                    for (int j = 0; j < resources; j++) {
+                        if (need[i][j] > work[j]) {
+                            canFinish = false;
+                            break;
+                        }
+                    }
+                    if (canFinish) {
+                        for (int j = 0; j < resources; j++) {
+                            work[j] += allocation[i][j];
+                        }
+                        finish[i] = true;
+                        found = true;
+                        count++;
+                    }
+                }
+            }
+            if (!found) {
+                return false; // Deadlock detected
+            }
+        }
+        return true; // Safe state
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter number of processes: ");
+        int processes = sc.nextInt();
+        System.out.print("Enter number of resources: ");
+        int resources = sc.nextInt();
+        int[][] allocation = new int[processes][resources];
+        System.out.println("Enter allocation matrix:");
+        for (int i = 0; i < processes; i++) {
+            for (int j = 0; j < resources; j++) {
+                allocation[i][j] = sc.nextInt();
+            }
+        }
+        int[][] max = new int[processes][resources];
+        System.out.println("Enter maximum matrix:");
+        for (int i = 0; i < processes; i++) {
+            for (int j = 0; j < resources; j++) {
+                max[i][j] = sc.nextInt();
+            }
+        }
+        int[] available = new int[resources];
+        System.out.println("Enter available resources:");
+        for (int i = 0; i < resources; i++) {
+            available[i] = sc.nextInt();
+        }
+        if (isSafe(processes, resources, allocation, max, available)) {
+            System.out.println("The system is in a safe state.");
+        } else {
+            System.out.println("The system is in a deadlock state.");
+        }
+
+        sc.close();
+    }
+}
+14.	Write a program for Deadlock detection algorithm //same as 13
