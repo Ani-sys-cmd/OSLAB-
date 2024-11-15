@@ -1,0 +1,70 @@
+23.	Write a shell script to perform following operations on   student database.
+a) Insert b) Delete c)Update d)Search
+#!/bin/bash
+
+DATABASE="student_db.txt"
+
+# Function to insert a new student record
+insert_student() {
+    echo "Enter Student ID:"
+    read student_id
+    echo "Enter Name:"
+    read name
+    echo "Enter Grade:"
+    read grade
+   
+    echo "$student_id,$name,$grade" >> "$DATABASE"
+    echo "Student record inserted successfully."
+}
+
+# Function to delete a student record by ID
+delete_student() {
+    echo "Enter Student ID to delete:"
+    read student_id
+    grep -v "^$student_id," "$DATABASE" > temp_db.txt && mv temp_db.txt "$DATABASE"
+    echo "Student record deleted successfully (if found)."
+}
+
+# Function to update a student record by ID
+update_student() {
+    echo "Enter Student ID to update:"
+    read student_id
+   
+    grep -v "^$student_id," "$DATABASE" > temp_db.txt && mv temp_db.txt "$DATABASE"
+
+    echo "Enter new Name:"
+    read name
+    echo "Enter new Grade:"
+    read grade
+
+    echo "$student_id,$name,$grade" >> "$DATABASE"
+    echo "Student record updated successfully."
+}
+
+# Function to search for a student record by ID
+search_student() {
+    echo "Enter Student ID to search:"
+    read student_id
+   
+    grep "^$student_id," "$DATABASE" || echo "Student not found."
+}
+
+# Main menu
+while true; do
+    echo "Select an option:"
+    echo "1) Insert Student"
+    echo "2) Delete Student"
+    echo "3) Update Student"
+    echo "4) Search Student"
+    echo "5) Exit"
+    read choice
+
+    case $choice in
+        1) insert_student ;;
+        2) delete_student ;;
+        3) update_student ;;
+        4) search_student ;;
+        5) exit ;;
+        *) echo "Invalid choice. Please try again." ;;
+    esac
+done
