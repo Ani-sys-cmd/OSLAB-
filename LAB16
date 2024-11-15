@@ -1,0 +1,69 @@
+16.	Write a program to calculate the number of page faults for a reference string for the LRU page replacement algorithms: 
+import java.util.*;
+
+public class LRUPageReplacement {
+
+    public static int calculatePageFaults(int[] pages, int frameSize) {
+        Set<Integer> frames = new HashSet<>(frameSize); // Pages currently in frame
+        Map<Integer, Integer> pageIndices = new HashMap<>(); // Tracks the last used index for each page
+        int pageFaults = 0;
+
+        for (int i = 0; i < pages.length; i++) {
+            int page = pages[i];
+
+            // Check if the page is already in frame (no page fault)
+            if (!frames.contains(page)) {
+                pageFaults++; // Page fault occurs
+
+                // If frame is full, remove the least recently used page
+                if (frames.size() == frameSize) {
+                    int lruPage = findLeastRecentlyUsedPage(pageIndices, frames);
+                    frames.remove(lruPage);
+                    pageIndices.remove(lruPage);
+                }
+
+                frames.add(page);
+            }
+
+            // Update the page's most recent index
+            pageIndices.put(page, i);
+        }
+
+        return pageFaults;
+    }
+
+    // Finds the least recently used page in the current set of frames
+    private static int findLeastRecentlyUsedPage(Map<Integer, Integer> pageIndices, Set<Integer> frames) {
+        int lruPage = -1;
+        int oldestIndex = Integer.MAX_VALUE;
+
+        for (int page : frames) {
+            int lastUsedIndex = pageIndices.get(page);
+            if (lastUsedIndex < oldestIndex) {
+                oldestIndex = lastUsedIndex;
+                lruPage = page;
+            }
+        }
+
+        return lruPage;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of pages in the reference string: ");
+        int n = scanner.nextInt();
+        int[] pages = new int[n];
+
+        System.out.println("Enter the reference string:");
+        for (int i = 0; i < n; i++) {
+            pages[i] = scanner.nextInt();
+        }
+
+        System.out.print("Enter the frame size: ");
+        int frameSize = scanner.nextInt();
+
+        int pageFaults = calculatePageFaults(pages, frameSize);
+        System.out.println("Total Page Faults: " + pageFaults);
+    }
+}
