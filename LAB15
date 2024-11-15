@@ -1,0 +1,74 @@
+15.	Write a program to calculate the number of page faults for a reference string for the FIFO page replacement algorithms:
+import java.util.Scanner;
+
+public class FIFOPageReplacement {
+    static final int MAX_PAGES = 3;
+
+    static boolean isInMemory(int page, int[] memory, int numFrames) {
+        for (int i = 0; i < numFrames; i++) {
+            if (memory[i] == page) {
+                return true; // Page is in memory
+            }
+        }
+        return false; // Page is not in memory
+    }
+
+    static void displayMemory(int[] memory, int numFrames) {
+        System.out.print("Memory: ");
+        for (int i = 0; i < numFrames; i++) {
+            System.out.print(memory[i] + " ");
+        }
+        System.out.println();
+    }
+
+    static void FIFO(int[] pages, int numPages) {
+        int[] memory = new int[MAX_PAGES];
+        for (int i = 0; i < MAX_PAGES; i++) {
+            memory[i] = -1;
+        }
+        int front = 0;
+        int hits = 0, misses = 0;
+
+        System.out.print("Referenced String: ");
+        for (int page : pages) {
+            System.out.print(page + " ");
+        }
+        System.out.println();
+
+        System.out.println("FIFO Page Replacement:");
+        for (int i = 0; i < numPages; i++) {
+            int currentPage = pages[i];
+            if (isInMemory(currentPage, memory, MAX_PAGES)) {
+                hits++;
+            } else {
+                misses++;
+                memory[front] = currentPage;
+                front = (front + 1) % MAX_PAGES;
+            }
+            displayMemory(memory, MAX_PAGES);
+        }
+
+        System.out.println("Hits: " + hits);
+        System.out.println("Misses: " + misses);
+        System.out.println("Page Faults: " + misses);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of pages: ");
+        int numPages = scanner.nextInt();
+
+        int[] pages = new int[numPages];
+
+        System.out.println("Enter the page references:");
+        for (int i = 0; i < numPages; i++) {
+            pages[i] = scanner.nextInt();
+        }
+
+        // Call the FIFO function with the inputted pages
+        FIFO(pages, numPages);
+        
+        scanner.close();
+    }
+}
