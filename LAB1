@@ -1,0 +1,180 @@
+1.	Any shell scripting program. 
+Print Sum of Digits of a given number using command line argument.
+ #!/bin/bash
+read -p "Enter number: " number
+sum=0
+while [ $number -gt 0 ]; do
+        digit=$(( number % 10 ))
+        sum=$(( sum + digit ))
+        number=$(( number / 10 ))
+done
+
+echo "sum of digits: $sum"
+
+Output:
+ubuntu@ubuntu:~/Desktop$ ./sum_of_digit.sh
+Enter number: 123          
+sum of digits: 6
+
+Write a shell script using function for following:
+1) Average of given numbers 
+2) Max digit from given number and 
+3) Min digit from given number.
+
+#!/bin/bash
+average() {
+        sum=0
+        count=0
+        for num in "$@"; do
+                sum=$((sum + num))
+                count=$((count + 1))
+        done
+        avg=$(echo "scale=2; $sum / $count" | bc)
+        echo "Average of given numbers: $avg"
+}
+
+max_number() {
+        max=$1
+        for num in "$@"; do
+                if (( num > max )); then
+                        max=$num
+                fi
+        done
+        echo "Maximum: $max"
+}
+
+min_number() {
+        min=$1
+        for num in "$@"; do
+                if (( num < min )); then
+                        min=$num
+                fi
+        done
+        echo "Minimum: $min"
+}
+
+echo "Enter Numbers: "
+read -a numbers
+average "${numbers[@]}"
+max_number "${numbers[@]}"
+min_number "${numbers[@]}"
+
+Output:
+Enter Numbers:
+20 30
+Average of given numbers: 25.00
+Maximum: 30
+Minimum: 20
+
+Perform sorting on given array elements.
+
+#!/bin/bash
+sort_array() {
+        arr=("$@")
+        n=${#arr[@]}
+
+        for ((i = 0; i < n; i++)); do
+                for ((j = i + 1; j < n; j++)); do
+                        if ((arr[i] > arr[j])); then
+                                temp=${arr[i]}
+                                arr[i]=${arr[j]}
+                                arr[j]=$temp
+                        fi
+                done
+        done
+
+        echo "Sorted Array: ${arr[@]}"
+}
+
+echo "Enter Numbers: "
+read -a numbers
+sort_array "${numbers[@]}"
+
+Output:
+Enter Numbers:
+9 1 6 3 4 8 2 5 7
+Sorted Array: 1 2 3 4 5 6 7 8 9
+
+Program to find factorial of a given number with and without recursion.
+#!/bin/bash
+factorial_iterative() {
+        num=$1
+        factorial=1
+        for ((i = 2; i <= num; i++)); do
+                factorial=$((factorial * i))
+        done
+        echo  $factorial
+}
+
+factorial_recursive() {
+        num=$1
+        if ((num <= 1)); then
+                echo 1
+        else
+                echo $((num * $(factorial_recursive $((num - 1)))))
+        fi
+}
+
+echo "Enter Number: "
+read number
+echo "Factorial (Iterative) of $number: $(factorial_iterative $number)"
+echo "Factorial (Recursive) of $number: $(factorial_recursive $number)"
+
+Output:
+Enter Number:
+5
+Factorial (Iterative) of 5: 120
+Factorial (Recursive) of 5: 120
+
+Program to check file type and permission for a given file.
+
+#!/bin/bash
+check_file() {
+        local file=$1
+        if [ -e "$file" ]; then
+                file_type=$(file -b "$file")
+                permissions=$(stat -c "%A" "$file")
+                echo "File Type: $file_type"
+                echo "Permissions: $permissions"
+        else
+                echo "File does not exist"
+        fi
+}
+
+echo "Enter file path: "
+read file_path
+
+check_file "$file_path"
+
+Output:
+Enter file path:
+hello.txt
+File Type: ASCII text
+Permissions: -rw-rw-r—
+
+Check entered string is palindrome or not?
+
+#!/bin/bash
+is_palindrome() {
+        local str="$1"
+        local reversed_str=$(echo "$str" | rev)
+
+        if [ "$str" = "$reversed_str" ]; then
+                echo "The string is palindrome"
+        else
+                echo "The string is not palindrome"
+        fi
+}
+
+echo "Enter String: "
+read input_string
+is_palindrome "$input_string"
+
+Output:
+Enter String:
+madam
+The string is palindrome
+
+Enter String:
+hello
+The string is not palindrome
