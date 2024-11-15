@@ -1,0 +1,196 @@
+2.	Write a program demonstrating use of different system calls. 	
+#include <iostream>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <cstring>
+#include <errno.h>
+#include <signal.h>
+#include <sys/utsname.h>
+
+using namespace std;
+
+void process_system_calls();
+void file_system_calls();
+void communication_system_calls();
+void information_system_calls();
+
+int main() {
+    int choice;
+
+    while (true) {
+        cout << "\n--- System Call Menu ---\n";
+        cout << "1. Process Related\n";
+        cout << "2. File Related\n";
+        cout << "3. Communication Related\n";
+        cout << "4. Information Related\n";
+        cout << "5. Exit\n";
+        cout << "Choose an option: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: process_system_calls(); break;
+            case 2: file_system_calls(); break;
+            case 3: communication_system_calls(); break;
+            case 4: information_system_calls(); break;
+            case 5: exit(0);
+            default: cout << "Invalid choice! Try again.\n";
+        }
+    }
+
+    return 0;
+}
+
+void process_system_calls() {
+    int choice;
+    pid_t pid;
+
+    cout << "\n--- Process Related Calls ---\n";
+    cout << "1. Fork\n2. Exit\n3. Wait\n4. Kill\n5. Exec\n";
+    cout << "Choose an option: ";
+    cin >> choice;
+
+    switch (choice) {
+        case 1:
+            pid = fork();
+            if (pid == 0) cout << "Child PID: " << getpid() << endl;
+            else { cout << "Parent PID: " << getpid() << endl; wait(nullptr); }
+            break;
+        case 2:
+            cout << "Process will exit now.\n";
+            exit(0);
+            break;
+        case 3:
+            pid = fork();
+            if (pid == 0) { sleep(2); exit(0); }
+            else { cout << "Waiting for child...\n"; wait(nullptr); }
+            break;
+        case 4:
+            pid = fork();
+            if (pid == 0) while (true); // Infinite loop
+            else { sleep(1); cout << "Killing child process...\n"; kill(pid, SIGKILL); wait(nullptr); }
+            break;
+        case 5:
+            if (fork() == 0) execl("/bin/ls", "ls", nullptr);
+            else wait(nullptr);
+            break;
+        default: cout << "Invalid choice!\n";
+    }
+}
+
+void file_system_calls() {
+    int choice;
+    int fd;
+    char buffer[100];
+
+    cout << "\n--- File Related Calls ---\n";
+    cout << "1. Open/Read/Write/Close\n2. Link/Unlink\n3. Stat\n";
+    cout << "Choose an option: ";
+    cin >> choice;
+
+    switch (choice) {
+        case 1:
+            fd = open("testfile.txt", O_CREAT | O_RDWR, 0644);
+            if (fd == -1) { perror("Error opening file"); return; }
+            write(fd, "Hello, World!\n", 14);
+            lseek(fd, 0, SEEK_SET);
+            read(fd, buffer, sizeof(buffer));
+            cout << "File content: " << buffer << endl;
+            close(fd);
+            break;
+        case 2:
+            link("testfile.txt", "testfile_link.txt");
+            cout << "Link created.\n";
+            unlink("testfile_link.txt");
+            cout << "Link removed.\n";
+            break;
+        case 3: {
+            struct stat fileStat;
+            if (stat("testfile.txt", &fileStat) < 0) { perror("Error getting stats"); return; }
+            cout << "File Size: " << fileStat.st_size << " bytes\n";
+            cout << "File Permissions: " << (fileStat.st_mode & 0777) << endl;
+            break;
+        }
+        default: cout << "Invalid choice!\n";
+    }
+}
+
+void communication_system_calls() {
+    int choice;
+    cout << "1. Pipe\n2. FIFO\nChoose an option: ";
+    cin >> choice;
+    
+    if (choice == 1) {
+        int fd[2];
+        pid_t pid;
+        char buffer[100];
+
+        if (pipe(fd) == -1) {
+            perror("Pipe failed");
+            return;
+        }
+
+        pid = fork();
+        if (pid == 0) {
+            close(fd[0]); 
+            write(fd[1], "Message via Pipe", 16);
+            close(fd[1]);
+            exit(0);
+        } else {
+            close(fd[1]); 
+            int bytesRead = read(fd[0], buffer, sizeof(buffer));
+            buffer[bytesRead] = '\0'; 
+            cout << "Received: " << buffer << endl;
+            close(fd[0]);
+            wait(nullptr);
+        }
+    } else if (choice == 2) {
+        const char *fifo = "/tmp/myfifo";
+        mkfifo(fifo, 0666);
+
+        if (fork() == 0) {
+            int fd = open(fifo, O_WRONLY);
+            write(fd, "Message via FIFO", 16);
+            close(fd);
+            exit(0);
+        } else {
+            char buffer[100];
+            int fd = open(fifo, O_RDONLY);
+            int bytesRead = read(fd, buffer, sizeof(buffer));
+            buffer[bytesRead] = '\0'; 
+            cout << "Received: " << buffer << endl;
+            close(fd);
+            wait(nullptr);
+        }
+
+        unlink(fifo);
+    } else {
+        cout << "Invalid option!\n";
+    }
+}
+
+void information_system_calls() {
+    int choice;
+    struct utsname buffer;
+
+    cout << "\n--- Information Related Calls ---\n";
+    cout << "1. Get PID\n2. Get PPID\n3. Uname\n";
+    cout << "Choose an option: ";
+    cin >> choice;
+
+    switch (choice) {
+        case 1: cout << "PID: " << getpid() << endl; break;
+        case 2: cout << "PPID: " << getppid() << endl; break;
+        case 3:
+            if (uname(&buffer) < 0) { perror("Uname failed"); return; }
+            cout << "System: " << buffer.sysname << endl;
+            cout << "Node: " << buffer.nodename << endl;
+            cout << "Release: " << buffer.release << endl;
+            cout << "Version: " << buffer.version << endl;
+            cout << "Machine: " << buffer.machine << endl;
+            break;
+        default: cout << "Invalid choice!\n";
+    }
+}
